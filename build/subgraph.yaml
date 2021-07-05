@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: Dough
@@ -20,7 +20,7 @@ dataSources:
         - Approval
       abis:
         - name: Dough
-          file: ./abis/Dough.json
+          file: Dough/abis/Dough.json
       eventHandlers:
         - event: ClaimedTokens(indexed address,indexed address,uint256)
           handler: handleClaimedTokens
@@ -30,4 +30,4 @@ dataSources:
           handler: handleNewCloneToken
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
-      file: ./src/Dough.ts
+      file: Dough/Dough.wasm
