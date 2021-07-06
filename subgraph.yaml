@@ -23,13 +23,13 @@ dataSources:
           file: ./abis/Dough.json
       eventHandlers:
         - event: ClaimedTokens(indexed address,indexed address,uint256)
-          handler: handleClaimedTokens
+          handler: handlerClaimedTokens
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
+          handler: handlerTransfer
         - event: NewCloneToken(indexed address,uint256)
-          handler: handleNewCloneToken
+          handler: handlerNewCloneToken
         - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
+          handler: handlerApproval
       file: ./src/Dough.ts
   - kind: ethereum/contract
     name: Ypie
@@ -69,9 +69,9 @@ dataSources:
         - event: AnnualizedFeeSet(uint256)
           handler: handlerAnnualizedFeeSet
         - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
+          handler: handlerApproval
         - event: Call(indexed address,indexed address,bytes,uint256)
-          handler: handleErrorCall
+          handler: handlerCall
         - event: CallerAdded(indexed address)
           handler: handlerCallerAdded
         - event: CallerRemoved(indexed address)
