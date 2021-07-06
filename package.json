@@ -1,13 +1,13 @@
 {
-  "name": "dough-subgraph",
+  "name": "piedao-subgraph-mainnet",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ chiptuttofuso/dough-subgraph",
-    "create-local": "graph create --node http://localhost:8020/ chiptuttofuso/dough-subgraph",
-    "remove-local": "graph remove --node http://localhost:8020/ chiptuttofuso/dough-subgraph",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 chiptuttofuso/dough-subgraph"
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ chiptuttofuso/piedao-subgraph-mainnet",
+    "create-local": "graph create --node http://localhost:8020/ chiptuttofuso/piedao-subgraph-mainnet",
+    "remove-local": "graph remove --node http://localhost:8020/ chiptuttofuso/piedao-subgraph-mainnet",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 chiptuttofuso/piedao-subgraph-mainnet"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.20.1",

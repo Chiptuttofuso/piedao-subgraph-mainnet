@@ -1,4 +1,11 @@
 type Holder @entity {
   id: ID!
+  tokens: [Token!]! @derivedFrom(field: "holder")
+}
+
+type Token @entity {
+  id: ID!
   balance: BigInt!
+  symbol: String!
+  holder: Holder!
 }
