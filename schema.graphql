@@ -1,3 +1,15 @@
+type GlobalStat @entity {
+  id: ID!,
+  locksCounter: BigInt # this should be improved by adding a one-to-many as we did for holdersCounter...
+  holdersCounter: [HoldersCounter!] @derivedFrom(field: "globalStat")
+}
+
+type HoldersCounter @entity {
+  id: ID!
+  count: BigInt!
+  globalStat: GlobalStat!
+}
+
 type Holder @entity {
   id: ID!
   tokens: [Token!]! @derivedFrom(field: "holder")

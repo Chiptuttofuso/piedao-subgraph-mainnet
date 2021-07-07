@@ -71,7 +71,7 @@ dataSources:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handlerApproval
         - event: Call(indexed address,indexed address,bytes,uint256)
-          handler: handleCall
+          handler: handlerCall
         - event: CallerAdded(indexed address)
           handler: handlerCallerAdded
         - event: CallerRemoved(indexed address)

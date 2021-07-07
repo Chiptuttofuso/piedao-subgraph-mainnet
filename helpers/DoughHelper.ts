@@ -11,21 +11,21 @@ export class DoughHelper {
 
   static incrementAmount(address: Address, amount: BigInt): void {
     // loading the Holder Entity, or creating one if doesn't exist yet...
-    let holder = EntityHelper.loadHolder(address.toHex());
+    let holder = EntityHelper.loadHolder(address.toHex(), "DOUGH");
 
     // loading the Token Entity, or creating one if doesn't exist yet...
     let token = EntityHelper.loadToken(address.toHex(), "DOUGH", holder, amount);
     token.balance = token.balance.plus(amount);
-    token.save();     
+    token.save();
   }
 
   static decrementAmount(address: Address, amount: BigInt): void {
     // loading the Holder Entity, or creating one if doesn't exist yet...
-    let holder = EntityHelper.loadHolder(address.toHex());
+    let holder = EntityHelper.loadHolder(address.toHex(), "DOUGH");
 
     // loading the Token Entity, or creating one if doesn't exist yet...
     let token = EntityHelper.loadToken(address.toHex(), "DOUGH", holder, amount);
     token.balance = token.balance.minus(amount);
-    token.save();    
+    token.save();
   }  
 }
