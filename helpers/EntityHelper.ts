@@ -18,11 +18,12 @@ export class EntityHelper {
 
   static loadHoldersCounter(symbol: string): HoldersCounter {
     let holdersCounter = HoldersCounter.load(symbol);
+    let stats = this.loadGlobalStats();
 
     if(holdersCounter == null) {
       holdersCounter = new HoldersCounter(symbol);
       holdersCounter.count = BigInt.fromI32(0);
-      holdersCounter.globalStat = UNIQUE_STAT_ID;
+      holdersCounter.globalStat = stats.id;
       holdersCounter.save();
     }
 
