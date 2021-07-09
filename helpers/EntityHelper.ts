@@ -1,7 +1,6 @@
 import { BigInt, Bytes } from "@graphprotocol/graph-ts"
 import { Holder, Token, GlobalStat, HoldersCounter } from "../generated/schema"
-import { PieVault } from "../generated/Ypie/PieVault";
-import { Dough } from "../generated/Dough/Dough";
+import { ERC20 } from "../helpers/ERC20"
 const UNIQUE_STAT_ID = "unique_stats_id"
 export class EntityHelper {
 
@@ -54,7 +53,7 @@ export class EntityHelper {
     return <Holder>holder;
   }
 
-  static loadToken(id: string, tokenContract: Dough | PieVault, holder: Holder, amount: BigInt): Token {
+  static loadToken(id: string, tokenContract: ERC20, holder: Holder, amount: BigInt): Token {
     let token = Token.load(id + "_" + tokenContract.symbol());
 
     if (token == null) {

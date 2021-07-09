@@ -1,6 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts"
 import { EntityHelper } from "../helpers/EntityHelper"
 import { Dough } from "../generated/Dough/Dough"
+import { ERC20 } from "../helpers/ERC20"
 
 export class DoughHelper {
   constructor() {}
@@ -17,7 +18,7 @@ export class DoughHelper {
     let holder = EntityHelper.loadHolder(address.toHex(), dough.symbol());
 
     // loading the Token Entity, or creating one if doesn't exist yet...
-    let token = EntityHelper.loadToken(address.toHex(), dough, holder, amount);
+    let token = EntityHelper.loadToken(address.toHex(), <ERC20>dough, holder, amount);
     token.balance = token.balance.plus(amount);
     token.save();
   }
@@ -27,7 +28,7 @@ export class DoughHelper {
     let holder = EntityHelper.loadHolder(address.toHex(), dough.symbol());
 
     // loading the Token Entity, or creating one if doesn't exist yet...
-    let token = EntityHelper.loadToken(address.toHex(), dough, holder, amount);
+    let token = EntityHelper.loadToken(address.toHex(), <ERC20>dough, holder, amount);
     token.balance = token.balance.minus(amount);
     token.save();
   }  
