@@ -17,12 +17,23 @@ import {
   PoolJoined,
   TokenAdded,
   TokenRemoved,
-  Transfer
-} from "../generated/Ypie/Ypie"
+  Transfer,
+  PieVault
+} from "../generated/Ypie/PieVault"
 import {PieVaultsHelper } from "../helpers/PieVaultsHelper"
+import { log } from "@graphprotocol/graph-ts"
 
 export function handlerTransfer(event: Transfer): void {
-  PieVaultsHelper.transfer(event.params.from, event.params.to, event.params.value,  "YPIE");
+  let ypie = PieVault.bind(event.address);
+  let tokens = ypie.getTokens();
+
+  tokens.forEach(token => {
+    let tokenContract = PieVault.bind(token);
+    let tokenBalance = tokenContract.balanceOf(token);
+    log.info("balance of token -----> {} - {}", [token.toHex(), tokenBalance.toString()]);
+  });
+  
+  PieVaultsHelper.transfer(event.address, event.params.from, event.params.to, event.params.value);
 }
 
 export function handlerAnnualizedFeeSet(event: AnnualizedFeeSet): void {}

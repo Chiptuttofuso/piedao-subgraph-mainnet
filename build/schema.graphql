@@ -39,6 +39,14 @@ type Token @entity {
   balance: BigInt!
   # the symbol of the token
   symbol: String!
+  # the name of the token
+  name: String!
+  # the address of the token
+  address: Bytes!
+  # the decimals of the token
+  decimals: BigInt!
+  # the price of the token
+  price: BigInt!
   # the one-to-many reference to the parent entity
   holder: Holder!
 }

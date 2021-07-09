@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { BigInt, Bytes } from "@graphprotocol/graph-ts"
 import { Holder, Token, GlobalStat, HoldersCounter } from "../generated/schema"
 const UNIQUE_STAT_ID = "unique_stats_id"
 export class EntityHelper {
@@ -52,13 +52,17 @@ export class EntityHelper {
     return <Holder>holder;
   }
 
-  static loadToken(id: string, symbol: string, holder: Holder, amount: BigInt): Token {
+  static loadToken(id: string, symbol: string, name: string, holder: Holder, amount: BigInt): Token {
     let token = Token.load(id + "_" + symbol);
 
     if (token == null) {
       token = new Token(id + "_" + symbol);
       token.balance = amount;
-      token.symbol = "DOUGH";
+      token.symbol = symbol;
+      token.name = name;
+      token.address = <Bytes>Bytes.fromHexString(id);
+      token.decimals = BigInt.fromI32(18);
+      token.price = BigInt.fromI32(0);
       token.holder = holder.id;
       token.save();
     }

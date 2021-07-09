@@ -3,67 +3,23 @@ schema:
   file: schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Dough
-    network: mainnet
-    source:
-      address: "0xad32a8e6220741182940c5abf610bde99e737b2d"
-      abi: Dough
-      startBlock: 10840239
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - ClaimedTokens
-        - Transfer
-        - NewCloneToken
-        - Approval
-      abis:
-        - name: Dough
-          file: Dough/abis/Dough.json
-      eventHandlers:
-        - event: ClaimedTokens(indexed address,indexed address,uint256)
-          handler: handlerClaimedTokens
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handlerTransfer
-        - event: NewCloneToken(indexed address,uint256)
-          handler: handlerNewCloneToken
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handlerApproval
-      file: Dough/Dough.wasm
-  - kind: ethereum/contract
     name: Ypie
     network: mainnet
     source:
       address: "0x17525E4f4Af59fbc29551bC4eCe6AB60Ed49CE31"
       startBlock: 11477560
-      abi: Ypie
+      abi: PieVault
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - AnnualizedFeeSet
-        - Approval
-        - Call
-        - CallerAdded
-        - CallerRemoved
-        - CapSet
-        - EntryFeeBeneficiaryShareSet
-        - EntryFeeSet
-        - ExitFeeBeneficiaryShareSet
-        - ExitFeeSet
-        - FeeBeneficiarySet
-        - FeeCharged
-        - LockSet
-        - OwnershipTransferred
-        - PoolExited
-        - PoolJoined
-        - TokenAdded
-        - TokenRemoved
-        - Transfer
+        - GlobalStat
+        - HoldersCounter
+        - Holder
+        - Token
       abis:
-        - name: Ypie
+        - name: PieVault
           file: Ypie/abis/PieVault.json
       eventHandlers:
         - event: AnnualizedFeeSet(uint256)

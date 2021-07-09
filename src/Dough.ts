@@ -7,7 +7,7 @@ import {
 import { DoughHelper } from "../helpers/DoughHelper"
 
 export function handlerTransfer(event: Transfer): void {
-  DoughHelper.transfer(event.params._from, event.params._to, event.params._amount);
+  DoughHelper.transfer(event.address, event.params._from, event.params._to, event.params._amount);
 }
 
 export function handlerClaimedTokens(event: ClaimedTokens): void {}
