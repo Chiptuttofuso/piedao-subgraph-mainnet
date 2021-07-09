@@ -9,30 +9,30 @@ export class PieVaultsHelper {
     let ypie = PieVault.bind(contract);
 
     if(from.toHex() != "0x0") {
-      this.incrementAmount(from, amount, ypie.symbol(), ypie.name());
+      this.incrementAmount(from, amount, ypie);
     }
 
     if(to.toHex() != "0x0") {
-      this.decrementAmount(to, amount, ypie.symbol(), ypie.name());
+      this.decrementAmount(to, amount, ypie);
     }
    }
  
-   static incrementAmount(address: Address, amount: BigInt, symbol: string, name: string): void {
+   static incrementAmount(address: Address, amount: BigInt, ypie: PieVault): void {
      // loading the Holder Entity, or creating one if doesn't exist yet...
-     let holder = EntityHelper.loadHolder(address.toHex(), symbol);
+     let holder = EntityHelper.loadHolder(address.toHex(), ypie.symbol());
  
      // loading the Token Entity, or creating one if doesn't exist yet...
-     let token = EntityHelper.loadToken(address.toHex(), symbol, name, holder, amount);
+     let token = EntityHelper.loadToken(address.toHex(), ypie, holder, amount);
      token.balance = token.balance.plus(amount);
      token.save();
    }
  
-   static decrementAmount(address: Address, amount: BigInt, symbol: string, name: string): void {
+   static decrementAmount(address: Address, amount: BigInt, ypie: PieVault): void {
      // loading the Holder Entity, or creating one if doesn't exist yet...
-     let holder = EntityHelper.loadHolder(address.toHex(), symbol);
+     let holder = EntityHelper.loadHolder(address.toHex(), ypie.symbol());
  
      // loading the Token Entity, or creating one if doesn't exist yet...
-     let token = EntityHelper.loadToken(address.toHex(), symbol, name, holder, amount);
+     let token = EntityHelper.loadToken(address.toHex(), ypie, holder, amount);
      token.balance = token.balance.minus(amount);
      token.save();
    }    

@@ -1,5 +1,7 @@
 import { BigInt, Bytes } from "@graphprotocol/graph-ts"
 import { Holder, Token, GlobalStat, HoldersCounter } from "../generated/schema"
+import { PieVault } from "../generated/Ypie/PieVault";
+import { Dough } from "../generated/Dough/Dough";
 const UNIQUE_STAT_ID = "unique_stats_id"
 export class EntityHelper {
 
@@ -52,16 +54,16 @@ export class EntityHelper {
     return <Holder>holder;
   }
 
-  static loadToken(id: string, symbol: string, name: string, holder: Holder, amount: BigInt): Token {
-    let token = Token.load(id + "_" + symbol);
+  static loadToken(id: string, tokenContract: Dough | PieVault, holder: Holder, amount: BigInt): Token {
+    let token = Token.load(id + "_" + tokenContract.symbol());
 
     if (token == null) {
-      token = new Token(id + "_" + symbol);
+      token = new Token(id + "_" + tokenContract.symbol());
       token.balance = amount;
-      token.symbol = symbol;
-      token.name = name;
-      token.address = <Bytes>Bytes.fromHexString(id);
-      token.decimals = BigInt.fromI32(18);
+      token.symbol = tokenContract.symbol();
+      token.name = tokenContract.name();
+      token.address = <Bytes>tokenContract._address;
+      token.decimals = BigInt.fromI32(tokenContract.decimals());
       token.price = BigInt.fromI32(0);
       token.holder = holder.id;
       token.save();
