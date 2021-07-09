@@ -27,18 +27,25 @@ type Holder @entity {
   id: ID!
   # the one-to-many relationship, to keep track of all the tokens 
   # each holder is having, and it's total balance
-  tokens: [Token!]! @derivedFrom(field: "holder")
+  wallets: [Wallet!]! @derivedFrom(field: "holder")
 }
 
-type Token @entity {
+type Wallet @entity {
   # the id here is a componed string, combining the holder's address 
   # and the token's name as follows:
   # holder_address + "_" + token_name
   id: ID!
   # the total amount of token owned by a specific address
   balance: BigInt!
-  # the symbol of the token
-  symbol: String!
+  # the one-to-many reference to the parent entity
+  holder: Holder!
+  # the one-to-one relationship with the Token entity
+  token: Token!
+}
+
+type Token @entity {
+  # the id here is the token's symbol (i.e: DOUGH, YPIE, etc)
+  id: ID!
   # the name of the token
   name: String!
   # the address of the token
@@ -47,6 +54,4 @@ type Token @entity {
   decimals: BigInt!
   # the price of the token
   price: BigInt!
-  # the one-to-many reference to the parent entity
-  holder: Holder!
 }

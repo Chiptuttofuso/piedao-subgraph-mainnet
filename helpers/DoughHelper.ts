@@ -15,21 +15,29 @@ export class DoughHelper {
 
   static incrementAmount(address: Address, amount: BigInt, dough: Dough): void {
     // loading the Holder Entity, or creating one if doesn't exist yet...
-    let holder = EntityHelper.loadHolder(address.toHex(), dough.symbol());
+    let holder = EntityHelper.loadHolder(address.toHex(), <ERC20>dough);
 
     // loading the Token Entity, or creating one if doesn't exist yet...
-    let token = EntityHelper.loadToken(address.toHex(), <ERC20>dough, holder, amount);
-    token.balance = token.balance.plus(amount);
-    token.save();
+    let token = EntityHelper.loadToken(<ERC20>dough);
+
+    // loading the Token Entity, or creating one if doesn't exist yet...
+    let wallet = EntityHelper.loadWallet(address.toHex(), holder, token);   
+
+    wallet.balance = wallet.balance.plus(amount);
+    wallet.save();
   }
 
   static decrementAmount(address: Address, amount: BigInt, dough: Dough): void {
     // loading the Holder Entity, or creating one if doesn't exist yet...
-    let holder = EntityHelper.loadHolder(address.toHex(), dough.symbol());
+    let holder = EntityHelper.loadHolder(address.toHex(), <ERC20>dough);
 
     // loading the Token Entity, or creating one if doesn't exist yet...
-    let token = EntityHelper.loadToken(address.toHex(), <ERC20>dough, holder, amount);
-    token.balance = token.balance.minus(amount);
-    token.save();
+    let token = EntityHelper.loadToken(<ERC20>dough);
+
+    // loading the Token Entity, or creating one if doesn't exist yet...
+    let wallet = EntityHelper.loadWallet(address.toHex(), holder, token); 
+
+    wallet.balance = wallet.balance.minus(amount);
+    wallet.save();
   }  
 }
