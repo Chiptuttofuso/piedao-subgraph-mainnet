@@ -26,7 +26,7 @@ export class PieVaultsHelper {
      let token = EntityHelper.loadToken(<ERC20>pieVault);
 
      // loading the Token Entity, or creating one if doesn't exist yet...
-     let wallet = EntityHelper.loadWallet(address.toHex(), holder, token);     
+     let wallet = EntityHelper.loadWallet(holder, token);     
      
      wallet.balance = wallet.balance.plus(amount);
      wallet.save();
@@ -40,7 +40,7 @@ export class PieVaultsHelper {
      let token = EntityHelper.loadToken(<ERC20>pieVault);
 
      // loading the Token Entity, or creating one if doesn't exist yet...
-     let wallet = EntityHelper.loadWallet(address.toHex(), holder, token);   
+     let wallet = EntityHelper.loadWallet(holder, token);   
 
      wallet.balance = wallet.balance.minus(amount);
      wallet.save();

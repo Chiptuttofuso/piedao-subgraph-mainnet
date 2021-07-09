@@ -68,11 +68,11 @@ export class EntityHelper {
     return <Token>token;
   }
 
-  static loadWallet(id: string, holder: Holder, token: Token): Wallet {
-    let wallet = Wallet.load(id);
+  static loadWallet(holder: Holder, token: Token): Wallet {
+    let wallet = Wallet.load(holder.id + "_" + token.id);
 
     if (wallet == null) {
-      wallet = new Wallet(id);
+      wallet = new Wallet(holder.id + "_" + token.id);
       wallet.balance = BigInt.fromI32(0);
       wallet.holder = holder.id;
       wallet.token = token.id;
