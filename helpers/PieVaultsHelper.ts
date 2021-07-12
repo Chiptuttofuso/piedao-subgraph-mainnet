@@ -1,102 +1,109 @@
-import { Address, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts"
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts"
 import { EntityHelper } from "../helpers/EntityHelper"
-import { PieVault } from "../generated/Ypie/PieVault"
-import { Factory } from "../generated/Ypie/Factory"
-import { Pair, Pair__getReservesResult } from "../generated/Ypie/Pair"
+import { PriceHelper } from "../helpers/PriceHelper"
+import { PieVault, PoolExited, PoolJoined } from "../generated/Ypie/PieVault"
+import { PieLog } from "../generated/schema"
 import { ERC20 } from "../helpers/ERC20"
 
-class PriceSet {
-  constructor(public tokenPrice: BigDecimal, public ethPrice: BigDecimal) {
-    this.tokenPrice = tokenPrice
-    this.ethPrice = ethPrice
-  }
-}
-
 export class PieVaultsHelper {
-  constructor() {}
+  constructor() { }
 
   static transfer(contract: Address, from: Address, to: Address, amount: BigInt): void {
     let pieVault = PieVault.bind(contract);
 
-    if(from.toHex() != "0x0000000000000000000000000000000000000000") {
+    if (from.toHex() != "0x0000000000000000000000000000000000000000") {
       this.decrementAmount(from, amount, pieVault);
     }
 
-    if(to.toHex() != "0x0000000000000000000000000000000000000000") {
+    if (to.toHex() != "0x0000000000000000000000000000000000000000") {
       this.incrementAmount(to, amount, pieVault);
     }
-   }
+  }
 
-   static mint(address: Address, amount: BigInt, pieVault: PieVault): void {
+  static calculateTokensPrices(pieVault: PieVault, transaction: ethereum.Transaction, pieLog: PieLog): void {
+    // retrieving all the underlying tokens...
+    let tokens = pieVault.getTokens();
 
-   }
+    // for each tokens, we generate the relative entities...
+    for(let i = 0; i < tokens.length; i++) {
+      let token = tokens[i];
 
-   static burn(address: Address, amount: BigInt, pieVault: PieVault): void {
-     
-  }   
- 
-   static incrementAmount(address: Address, amount: BigInt, pieVault: PieVault): void {
-     // loading the Holder Entity, or creating one if doesn't exist yet...
-     let holder = EntityHelper.loadHolder(address.toHex(), <ERC20>pieVault);
- 
-     // loading the Token Entity, or creating one if doesn't exist yet...
-     let token = EntityHelper.loadToken(<ERC20>pieVault);
+      let tokenContract = PieVault.bind(token);
+      let tokenBalance = tokenContract.balanceOf(token);
+      let price = PriceHelper.findTokenPrice(token);
 
-     // loading the Token Entity, or creating one if doesn't exist yet...
-     let position = EntityHelper.loadPosition(holder, token);     
-     
-     position.balance = position.balance.plus(amount.toBigDecimal());
-     position.save();
-   }
- 
-   static decrementAmount(address: Address, amount: BigInt, pieVault: PieVault): void {
-     // loading the Holder Entity, or creating one if doesn't exist yet...
-     let holder = EntityHelper.loadHolder(address.toHex(), <ERC20>pieVault);
- 
-     // loading the Token Entity, or creating one if doesn't exist yet...
-     let token = EntityHelper.loadToken(<ERC20>pieVault);
+      let tokenEntity = EntityHelper.loadToken(<ERC20>tokenContract);
+      let tokenInPieTransaction = EntityHelper.loadTokenInPieTransaction(transaction.hash.toHex(), tokenEntity, pieLog);
 
-     // loading the Token Entity, or creating one if doesn't exist yet...
-     let position = EntityHelper.loadPosition(holder, token);   
+      tokenInPieTransaction.price = price.tokenPrice;
+      tokenInPieTransaction.balance = tokenBalance.toBigDecimal();
+      tokenInPieTransaction.save();
+    };   
+  }
 
-     position.balance = position.balance.minus(amount.toBigDecimal());
-     position.save();
-   }
+  static mint(event: PoolJoined): void {
+    // loading the pieVault, to be used for the Token and the PieLog...
+    let pieVault = PieVault.bind(event.address);
 
-   static findTokenPrice(tokenAddress: Address): PriceSet {
-    let FACTORY_ADDRESS = Address.fromString('0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f');
-    let WETH_ADDRESS = Address.fromString('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2');
+    // loading the pieVault Entity, or creating one if doesn't exist yet...
+    let token = EntityHelper.loadToken(<ERC20>pieVault);
 
-    let factoryContract = Factory.bind(FACTORY_ADDRESS);
-    let pairAddress = factoryContract.getPair(Address.fromString(tokenAddress.toHexString()), WETH_ADDRESS);
-    let pairContract = Pair.bind(pairAddress);
-  
-    let tryReserves = pairContract.try_getReserves();
-    let reserves: Pair__getReservesResult;
+    // loading the PieLog Entity, or creating one if doesn't exist yet...
+    let pieLog = EntityHelper.loadPieLog(event.transaction.hash.toHex(), token, "mint", event.params.amount, event.block);
 
-    if(tryReserves.reverted) {
-      log.warning(
-        '****00091 pairAddress.getReserves failed pairAddress {}, tokenAddress {}',
-        [
-          pairAddress.toHexString(),
-          tokenAddress.toHexString()
-        ]);
+    // TODO: updating the amount and the amountUSD for the pieLog Entity...
+    //  pieLog.amount = BigInt.fromI32(0).toBigDecimal();
+    //  pieLog.amountUSD = BigInt.fromI32(0).toBigDecimal();
+    //  pieLog.save();
 
-      return new PriceSet(BigInt.fromI32(0).toBigDecimal(), BigInt.fromI32(0).toBigDecimal());
-    } else {
-      reserves = tryReserves.value;
-      let token0 = pairContract.token0();
-      let tokenPrice:BigDecimal;
-      let ethPrice:BigDecimal;
-      if(token0 == tokenAddress) {
-        tokenPrice = reserves.value1.toBigDecimal().div(reserves.value0.toBigDecimal());
-        ethPrice = reserves.value0.toBigDecimal().div(reserves.value1.toBigDecimal());
-      } else {
-        tokenPrice = reserves.value0.toBigDecimal().div(reserves.value1.toBigDecimal());
-        ethPrice = reserves.value1.toBigDecimal().div(reserves.value0.toBigDecimal());
-      }
+    // generating the TokensInPieTransaction entities...
+    PieVaultsHelper.calculateTokensPrices(pieVault, event.transaction, pieLog);
+  }
 
-      return new PriceSet(tokenPrice, ethPrice);
-    }
-  }   
+  static burn(event: PoolExited): void {
+    // loading the pieVault, to be used for the Token and the PieLog...
+    let pieVault = PieVault.bind(event.address);
+
+    // loading the pieVault Entity, or creating one if doesn't exist yet...
+    let token = EntityHelper.loadToken(<ERC20>pieVault);
+
+    // loading the PieLog Entity, or creating one if doesn't exist yet...
+    let pieLog = EntityHelper.loadPieLog(event.transaction.hash.toHex(), token, "burn", event.params.amount, event.block);
+
+    // TODO: updating the amount and the amountUSD for the pieLog Entity...
+    //  pieLog.amount = BigInt.fromI32(0).toBigDecimal();
+    //  pieLog.amountUSD = BigInt.fromI32(0).toBigDecimal();
+    //  pieLog.save();
+
+    // generating the TokensInPieTransaction entities...
+    PieVaultsHelper.calculateTokensPrices(pieVault, event.transaction, pieLog);
+  }
+
+  static incrementAmount(address: Address, amount: BigInt, pieVault: PieVault): void {
+    // loading the Holder Entity, or creating one if doesn't exist yet...
+    let holder = EntityHelper.loadHolder(address.toHex(), <ERC20>pieVault);
+
+    // loading the Token Entity, or creating one if doesn't exist yet...
+    let token = EntityHelper.loadToken(<ERC20>pieVault);
+
+    // loading the Token Entity, or creating one if doesn't exist yet...
+    let position = EntityHelper.loadPosition(holder, token);
+
+    position.balance = position.balance.plus(amount.toBigDecimal());
+    position.save();
+  }
+
+  static decrementAmount(address: Address, amount: BigInt, pieVault: PieVault): void {
+    // loading the Holder Entity, or creating one if doesn't exist yet...
+    let holder = EntityHelper.loadHolder(address.toHex(), <ERC20>pieVault);
+
+    // loading the Token Entity, or creating one if doesn't exist yet...
+    let token = EntityHelper.loadToken(<ERC20>pieVault);
+
+    // loading the Token Entity, or creating one if doesn't exist yet...
+    let position = EntityHelper.loadPosition(holder, token);
+
+    position.balance = position.balance.minus(amount.toBigDecimal());
+    position.save();
+  }
 }

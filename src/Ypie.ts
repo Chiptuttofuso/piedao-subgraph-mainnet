@@ -17,38 +17,20 @@ import {
   PoolJoined,
   TokenAdded,
   TokenRemoved,
-  Transfer,
-  PieVault
+  Transfer
 } from "../generated/Ypie/PieVault"
 import {PieVaultsHelper } from "../helpers/PieVaultsHelper"
-import { log } from "@graphprotocol/graph-ts"
 
 export function handlerTransfer(event: Transfer): void {
-  let ypie = PieVault.bind(event.address);
-  let tokens = ypie.getTokens();
-
-  tokens.forEach(token => {
-    let tokenContract = PieVault.bind(token);
-    let tokenBalance = tokenContract.balanceOf(token);
-    let tokenPrice = PieVaultsHelper.findTokenPrice(token);
-    log.info("balance of token -----> {} - {} - {} - {}", 
-      [
-        tokenContract.name(), 
-        tokenBalance.toString(),
-        tokenPrice.ethPrice.toString(),
-        tokenPrice.tokenPrice.toString()
-      ]);
-  });
-  
   PieVaultsHelper.transfer(event.address, event.params.from, event.params.to, event.params.value);
 }
 
-export function handlerPoolExited(event: PoolExited): void {
-  // this is a burn 
+export function handlerPoolJoined(event: PoolJoined): void {
+  PieVaultsHelper.mint(event);
 }
 
-export function handlerPoolJoined(event: PoolJoined): void {
-  // this is a mint 
+export function handlerPoolExited(event: PoolExited): void {
+  PieVaultsHelper.burn(event);
 }
 
 export function handlerAnnualizedFeeSet(event: AnnualizedFeeSet): void {}
