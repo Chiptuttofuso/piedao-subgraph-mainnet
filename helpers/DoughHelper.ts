@@ -23,7 +23,7 @@ export class DoughHelper {
     // loading the Token Entity, or creating one if doesn't exist yet...
     let wallet = EntityHelper.loadWallet(holder, token);   
 
-    wallet.balance = wallet.balance.plus(amount);
+    wallet.balance = wallet.balance.plus(amount.toBigDecimal());
     wallet.save();
   }
 
@@ -37,7 +37,7 @@ export class DoughHelper {
     // loading the Token Entity, or creating one if doesn't exist yet...
     let wallet = EntityHelper.loadWallet(holder, token); 
 
-    wallet.balance = wallet.balance.minus(amount);
+    wallet.balance = wallet.balance.minus(amount.toBigDecimal());
     wallet.save();
   }  
 }

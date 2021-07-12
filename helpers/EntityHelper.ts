@@ -1,5 +1,5 @@
-import { BigInt, Bytes } from "@graphprotocol/graph-ts"
-import { Holder, Token, GlobalStat, HoldersCounter, Wallet } from "../generated/schema"
+import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts"
+import { Holder, Token, GlobalStat, HoldersCounter, Wallet, PieVault } from "../generated/schema"
 import { ERC20 } from "../helpers/ERC20"
 const UNIQUE_STAT_ID = "unique_stats_id"
 export class EntityHelper {
@@ -61,7 +61,6 @@ export class EntityHelper {
       token.name = tokenContract.name();
       token.address = <Bytes>tokenContract._address;
       token.decimals = BigInt.fromI32(tokenContract.decimals());
-      token.price = BigInt.fromI32(0);
       token.save();
     }
     
@@ -73,7 +72,7 @@ export class EntityHelper {
 
     if (wallet == null) {
       wallet = new Wallet(holder.id + "_" + token.id);
-      wallet.balance = BigInt.fromI32(0);
+      wallet.balance = BigInt.fromI32(0).toBigDecimal();
       wallet.holder = holder.id;
       wallet.token = token.id;
       wallet.save();
@@ -81,4 +80,26 @@ export class EntityHelper {
     
     return <Wallet>wallet;
   }  
+
+  static loadPieVault(id: string, token: Token, action: string, amount: BigInt, block: ethereum.Block): PieVault {
+    let pieVault = PieVault.load(id);
+
+    if (pieVault == null) {
+      pieVault = new PieVault(id);
+      pieVault.action = action;
+      pieVault.block = block.number;
+      pieVault.timestamp = block.timestamp;
+      pieVault.price = BigInt.fromI32(0).toBigDecimal();
+      pieVault.balance = BigInt.fromI32(0).toBigDecimal();
+      pieVault.totalSupply = BigInt.fromI32(0);
+      pieVault.token = token.id;
+      pieVault.save();
+    }
+    
+    /*
+      pieVault.balance = pieVault.totalSupply.plus(amount);
+      pieVault.totalSupply = pieVault.totalSupply.plus(amount.times(pieVault.price));
+    */
+    return <PieVault>pieVault;
+  }   
 }

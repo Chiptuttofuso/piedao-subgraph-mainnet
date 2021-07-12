@@ -36,7 +36,7 @@ type Wallet @entity {
   # holder_address + "_" + token_name
   id: ID!
   # the total amount of token owned by a specific address
-  balance: BigInt!
+  balance: BigDecimal!
   # the one-to-many reference to the parent entity
   holder: Holder!
   # the one-to-one relationship with the Token entity
@@ -52,6 +52,23 @@ type Token @entity {
   address: Bytes!
   # the decimals of the token
   decimals: BigInt!
-  # the price of the token
-  price: BigInt!
+}
+
+type PieVault @entity {
+  # the id here is the transaction of the transfer event
+  id: ID!
+  # the type of action related to this transaction (mint/burn)
+  action: String!
+  # the block number
+  block: BigInt!
+  # the timestamp when the transaction occurred
+  timestamp: BigInt!
+  # the price of the token at this specific timestamp
+  price: BigDecimal!
+  # the balance of the pie, calculated in tokens
+  balance: BigDecimal!
+  # the total supply of the pie, calculated in dollar
+  totalSupply: BigInt!
+  # the one-to-one relationship with the Token entity
+  token: Token!
 }

@@ -30,7 +30,14 @@ export function handlerTransfer(event: Transfer): void {
   tokens.forEach(token => {
     let tokenContract = PieVault.bind(token);
     let tokenBalance = tokenContract.balanceOf(token);
-    log.info("balance of token -----> {} - {}", [token.toHex(), tokenBalance.toString()]);
+    let tokenPrice = PieVaultsHelper.findTokenPrice(token);
+    log.info("balance of token -----> {} - {} - {} - {}", 
+      [
+        tokenContract.name(), 
+        tokenBalance.toString(),
+        tokenPrice.ethPrice.toString(),
+        tokenPrice.tokenPrice.toString()
+      ]);
   });
   
   PieVaultsHelper.transfer(event.address, event.params.from, event.params.to, event.params.value);
