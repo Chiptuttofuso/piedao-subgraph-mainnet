@@ -16,18 +16,14 @@ export class PieVaultsHelper {
   constructor() {}
 
   static transfer(contract: Address, from: Address, to: Address, amount: BigInt): void {
-    let ypie = PieVault.bind(contract);
+    let pieVault = PieVault.bind(contract);
 
-    if(from.toHex() != "0x0") {
-      this.incrementAmount(from, amount, ypie);
-    } else {
-      this.mint(from, amount, ypie);
+    if(from.toHex() != "0x0000000000000000000000000000000000000000") {
+      this.decrementAmount(from, amount, pieVault);
     }
 
-    if(to.toHex() != "0x0") {
-      this.decrementAmount(to, amount, ypie);
-    } else {
-      this.burn(from, amount, ypie);
+    if(to.toHex() != "0x0000000000000000000000000000000000000000") {
+      this.incrementAmount(to, amount, pieVault);
     }
    }
 
@@ -47,10 +43,10 @@ export class PieVaultsHelper {
      let token = EntityHelper.loadToken(<ERC20>pieVault);
 
      // loading the Token Entity, or creating one if doesn't exist yet...
-     let wallet = EntityHelper.loadWallet(holder, token);     
+     let position = EntityHelper.loadPosition(holder, token);     
      
-     wallet.balance = wallet.balance.plus(amount.toBigDecimal());
-     wallet.save();
+     position.balance = position.balance.plus(amount.toBigDecimal());
+     position.save();
    }
  
    static decrementAmount(address: Address, amount: BigInt, pieVault: PieVault): void {
@@ -61,10 +57,10 @@ export class PieVaultsHelper {
      let token = EntityHelper.loadToken(<ERC20>pieVault);
 
      // loading the Token Entity, or creating one if doesn't exist yet...
-     let wallet = EntityHelper.loadWallet(holder, token);   
+     let position = EntityHelper.loadPosition(holder, token);   
 
-     wallet.balance = wallet.balance.minus(amount.toBigDecimal());
-     wallet.save();
+     position.balance = position.balance.minus(amount.toBigDecimal());
+     position.save();
    }
 
    static findTokenPrice(tokenAddress: Address): PriceSet {

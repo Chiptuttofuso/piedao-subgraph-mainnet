@@ -156,17 +156,17 @@ export class Holder extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get wallets(): Array<string> {
-    let value = this.get("wallets");
+  get positions(): Array<string> {
+    let value = this.get("positions");
     return value.toStringArray();
   }
 
-  set wallets(value: Array<string>) {
-    this.set("wallets", Value.fromStringArray(value));
+  set positions(value: Array<string>) {
+    this.set("positions", Value.fromStringArray(value));
   }
 }
 
-export class Wallet extends Entity {
+export class Position extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -174,17 +174,17 @@ export class Wallet extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save Wallet entity without an ID");
+    assert(id !== null, "Cannot save Position entity without an ID");
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save Wallet entity with non-string ID. " +
+      "Cannot save Position entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("Wallet", id.toString(), this);
+    store.set("Position", id.toString(), this);
   }
 
-  static load(id: string): Wallet | null {
-    return store.get("Wallet", id) as Wallet | null;
+  static load(id: string): Position | null {
+    return store.get("Position", id) as Position | null;
   }
 
   get id(): string {
@@ -263,13 +263,13 @@ export class Token extends Entity {
     this.set("name", Value.fromString(value));
   }
 
-  get address(): Bytes {
-    let value = this.get("address");
-    return value.toBytes();
+  get symbol(): string {
+    let value = this.get("symbol");
+    return value.toString();
   }
 
-  set address(value: Bytes) {
-    this.set("address", Value.fromBytes(value));
+  set symbol(value: string) {
+    this.set("symbol", Value.fromString(value));
   }
 
   get decimals(): BigInt {
@@ -282,7 +282,7 @@ export class Token extends Entity {
   }
 }
 
-export class PieVault extends Entity {
+export class PieLog extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -290,17 +290,17 @@ export class PieVault extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save PieVault entity without an ID");
+    assert(id !== null, "Cannot save PieLog entity without an ID");
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save PieVault entity with non-string ID. " +
+      "Cannot save PieLog entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("PieVault", id.toString(), this);
+    store.set("PieLog", id.toString(), this);
   }
 
-  static load(id: string): PieVault | null {
-    return store.get("PieVault", id) as PieVault | null;
+  static load(id: string): PieLog | null {
+    return store.get("PieLog", id) as PieLog | null;
   }
 
   get id(): string {
@@ -310,6 +310,24 @@ export class PieVault extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
+  }
+
+  get pieAddress(): Bytes {
+    let value = this.get("pieAddress");
+    return value.toBytes();
+  }
+
+  set pieAddress(value: Bytes) {
+    this.set("pieAddress", Value.fromBytes(value));
+  }
+
+  get pieSymbol(): string {
+    let value = this.get("pieSymbol");
+    return value.toString();
+  }
+
+  set pieSymbol(value: string) {
+    this.set("pieSymbol", Value.fromString(value));
   }
 
   get action(): string {
@@ -339,6 +357,70 @@ export class PieVault extends Entity {
     this.set("timestamp", Value.fromBigInt(value));
   }
 
+  get amount(): BigDecimal {
+    let value = this.get("amount");
+    return value.toBigDecimal();
+  }
+
+  set amount(value: BigDecimal) {
+    this.set("amount", Value.fromBigDecimal(value));
+  }
+
+  get amountUSD(): BigDecimal {
+    let value = this.get("amountUSD");
+    return value.toBigDecimal();
+  }
+
+  set amountUSD(value: BigDecimal) {
+    this.set("amountUSD", Value.fromBigDecimal(value));
+  }
+
+  get tokensInPieTransaction(): Array<string> {
+    let value = this.get("tokensInPieTransaction");
+    return value.toStringArray();
+  }
+
+  set tokensInPieTransaction(value: Array<string>) {
+    this.set("tokensInPieTransaction", Value.fromStringArray(value));
+  }
+}
+
+export class TokenInPieTransaction extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id !== null,
+      "Cannot save TokenInPieTransaction entity without an ID"
+    );
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save TokenInPieTransaction entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("TokenInPieTransaction", id.toString(), this);
+  }
+
+  static load(id: string): TokenInPieTransaction | null {
+    return store.get(
+      "TokenInPieTransaction",
+      id
+    ) as TokenInPieTransaction | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
   get price(): BigDecimal {
     let value = this.get("price");
     return value.toBigDecimal();
@@ -357,15 +439,6 @@ export class PieVault extends Entity {
     this.set("balance", Value.fromBigDecimal(value));
   }
 
-  get totalSupply(): BigInt {
-    let value = this.get("totalSupply");
-    return value.toBigInt();
-  }
-
-  set totalSupply(value: BigInt) {
-    this.set("totalSupply", Value.fromBigInt(value));
-  }
-
   get token(): string {
     let value = this.get("token");
     return value.toString();
@@ -373,5 +446,14 @@ export class PieVault extends Entity {
 
   set token(value: string) {
     this.set("token", Value.fromString(value));
+  }
+
+  get pieLog(): string {
+    let value = this.get("pieLog");
+    return value.toString();
+  }
+
+  set pieLog(value: string) {
+    this.set("pieLog", Value.fromString(value));
   }
 }

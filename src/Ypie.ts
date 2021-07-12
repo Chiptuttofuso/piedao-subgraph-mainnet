@@ -43,6 +43,14 @@ export function handlerTransfer(event: Transfer): void {
   PieVaultsHelper.transfer(event.address, event.params.from, event.params.to, event.params.value);
 }
 
+export function handlerPoolExited(event: PoolExited): void {
+  // this is a burn 
+}
+
+export function handlerPoolJoined(event: PoolJoined): void {
+  // this is a mint 
+}
+
 export function handlerAnnualizedFeeSet(event: AnnualizedFeeSet): void {}
 
 export function handlerApproval(event: Approval): void {}
@@ -68,10 +76,6 @@ export function handlerFeeCharged(event: FeeCharged): void {}
 export function handlerLockSet(event: LockSet): void {}
 
 export function handlerOwnershipTransferred(event: OwnershipTransferred): void {}
-
-export function handlerPoolExited(event: PoolExited): void {}
-
-export function handlerPoolJoined(event: PoolJoined): void {}
 
 export function handlerTokenAdded(event: TokenAdded): void {}
 

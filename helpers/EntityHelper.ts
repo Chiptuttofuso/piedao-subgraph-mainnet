@@ -1,5 +1,5 @@
 import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts"
-import { Holder, Token, GlobalStat, HoldersCounter, Wallet, PieVault } from "../generated/schema"
+import { Holder, Token, GlobalStat, HoldersCounter, Position, PieLog } from "../generated/schema"
 import { ERC20 } from "../helpers/ERC20"
 const UNIQUE_STAT_ID = "unique_stats_id"
 export class EntityHelper {
@@ -54,12 +54,12 @@ export class EntityHelper {
   }
 
   static loadToken(tokenContract: ERC20): Token {
-    let token = Token.load(tokenContract.symbol());
+    let token = Token.load(tokenContract._address.toHex());
 
     if (token == null) {
-      token = new Token(tokenContract.symbol());
+      token = new Token(tokenContract._address.toHex());
       token.name = tokenContract.name();
-      token.address = <Bytes>tokenContract._address;
+      token.symbol = tokenContract.symbol();
       token.decimals = BigInt.fromI32(tokenContract.decimals());
       token.save();
     }
@@ -67,25 +67,25 @@ export class EntityHelper {
     return <Token>token;
   }
 
-  static loadWallet(holder: Holder, token: Token): Wallet {
-    let wallet = Wallet.load(holder.id + "_" + token.id);
+  static loadPosition(holder: Holder, token: Token): Position {
+    let position = Position.load(holder.id + "_" + token.id);
 
-    if (wallet == null) {
-      wallet = new Wallet(holder.id + "_" + token.id);
-      wallet.balance = BigInt.fromI32(0).toBigDecimal();
-      wallet.holder = holder.id;
-      wallet.token = token.id;
-      wallet.save();
+    if (position == null) {
+      position = new Position(holder.id + "_" + token.id);
+      position.balance = BigInt.fromI32(0).toBigDecimal();
+      position.holder = holder.id;
+      position.token = token.id;
+      position.save();
     }
     
-    return <Wallet>wallet;
+    return <Position>position;
   }  
 
-  static loadPieVault(id: string, token: Token, action: string, amount: BigInt, block: ethereum.Block): PieVault {
-    let pieVault = PieVault.load(id);
+  static loadPieVault(id: string, token: Token, action: string, amount: BigInt, block: ethereum.Block): PieLog {
+    let pieVault = PieLog.load(id);
 
     if (pieVault == null) {
-      pieVault = new PieVault(id);
+      pieVault = new PieLog(id);
       pieVault.action = action;
       pieVault.block = block.number;
       pieVault.timestamp = block.timestamp;

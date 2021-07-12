@@ -9,8 +9,8 @@ export class DoughHelper {
   static transfer(contract: Address, from: Address, to: Address, amount: BigInt): void {
     let dough = Dough.bind(contract);
 
-    this.incrementAmount(from, amount, dough);
-    this.decrementAmount(to, amount, dough);
+    this.decrementAmount(from, amount, dough);
+    this.incrementAmount(to, amount, dough);
   }
 
   static incrementAmount(address: Address, amount: BigInt, dough: Dough): void {
@@ -21,10 +21,10 @@ export class DoughHelper {
     let token = EntityHelper.loadToken(<ERC20>dough);
 
     // loading the Token Entity, or creating one if doesn't exist yet...
-    let wallet = EntityHelper.loadWallet(holder, token);   
+    let position = EntityHelper.loadPosition(holder, token);   
 
-    wallet.balance = wallet.balance.plus(amount.toBigDecimal());
-    wallet.save();
+    position.balance = position.balance.plus(amount.toBigDecimal());
+    position.save();
   }
 
   static decrementAmount(address: Address, amount: BigInt, dough: Dough): void {
@@ -35,9 +35,9 @@ export class DoughHelper {
     let token = EntityHelper.loadToken(<ERC20>dough);
 
     // loading the Token Entity, or creating one if doesn't exist yet...
-    let wallet = EntityHelper.loadWallet(holder, token); 
+    let position = EntityHelper.loadPosition(holder, token); 
 
-    wallet.balance = wallet.balance.minus(amount.toBigDecimal());
-    wallet.save();
+    position.balance = position.balance.minus(amount.toBigDecimal());
+    position.save();
   }  
 }

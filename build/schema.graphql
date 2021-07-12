@@ -23,17 +23,20 @@ type HoldersCounter @entity {
 }
 
 type Holder @entity {
+  # the Holder is an address either a smart contract or a EOA
+  # holding one or many positions.
+
   # the id here is the eth address of the holder, in hex format
   id: ID!
   # the one-to-many relationship, to keep track of all the tokens 
   # each holder is having, and it's total balance
-  wallets: [Wallet!]! @derivedFrom(field: "holder")
+  positions: [Position!]! @derivedFrom(field: "holder")
 }
 
-type Wallet @entity {
+type Position @entity {
   # the id here is a componed string, combining the holder's address 
-  # and the token's name as follows:
-  # holder_address + "_" + token_name
+  # and the token's address as follows:
+  # holder_address + "_" + token_address
   id: ID!
   # the total amount of token owned by a specific address
   balance: BigDecimal!
@@ -44,31 +47,47 @@ type Wallet @entity {
 }
 
 type Token @entity {
-  # the id here is the token's symbol (i.e: DOUGH, YPIE, etc)
+  # the id here is the token's address
   id: ID!
   # the name of the token
   name: String!
-  # the address of the token
-  address: Bytes!
+  # the symbol of the token
+  symbol: String!
   # the decimals of the token
   decimals: BigInt!
 }
 
-type PieVault @entity {
-  # the id here is the transaction of the transfer event
+type PieLog @entity {
+  # the id here is the transaction hash of the transfer event + "_" + pie_address
   id: ID!
+  # the pie address
+  pieAddress: Bytes!
+  # the pie symbol
+  pieSymbol: String!
   # the type of action related to this transaction (mint/burn)
   action: String!
   # the block number
   block: BigInt!
   # the timestamp when the transaction occurred
   timestamp: BigInt!
+  # amount of ypie generated/destroyed by the transaction event
+  amount: BigDecimal!
+  # amount in USD
+  amountUSD: BigDecimal!
+  # the one-to-many relationship, to keep track of all the tokens 
+  # involved into each transaction
+  tokensInPieTransaction: [TokenInPieTransaction!]! @derivedFrom(field: "pieLog")  
+}
+
+type TokenInPieTransaction @entity {
+  # the id here is transaction_hash + "_" + token_address
+  id: ID!
   # the price of the token at this specific timestamp
   price: BigDecimal!
   # the balance of the pie, calculated in tokens
   balance: BigDecimal!
-  # the total supply of the pie, calculated in dollar
-  totalSupply: BigInt!
   # the one-to-one relationship with the Token entity
   token: Token!
+  # the one-to-one relationship with the PieLog entity
+  pieLog: PieLog!  
 }
