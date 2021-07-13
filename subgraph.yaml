@@ -53,7 +53,9 @@ dataSources:
         - name: Factory
           file: ./abis/Factory.json
         - name: Pair
-          file: ./abis/Pair.json                    
+          file: ./abis/Pair.json
+        - name: LendingRegistry
+          file: ./abis/LendingRegistry.json          
       eventHandlers:
         - event: AnnualizedFeeSet(uint256)
           handler: handlerAnnualizedFeeSet

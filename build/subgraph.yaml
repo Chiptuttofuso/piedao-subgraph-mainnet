@@ -25,6 +25,8 @@ dataSources:
           file: Ypie/abis/Factory.json
         - name: Pair
           file: Ypie/abis/Pair.json
+        - name: LendingRegistry
+          file: Ypie/abis/LendingRegistry.json
       eventHandlers:
         - event: AnnualizedFeeSet(uint256)
           handler: handlerAnnualizedFeeSet

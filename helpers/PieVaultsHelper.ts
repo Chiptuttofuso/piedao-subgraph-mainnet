@@ -4,7 +4,9 @@ import { PriceHelper } from "../helpers/PriceHelper"
 import { PieVault, PoolExited, PoolJoined } from "../generated/Ypie/PieVault"
 import { PieLog } from "../generated/schema"
 import { ERC20 } from "../helpers/ERC20"
+import { LendingRegistry } from "../generated/Ypie/LendingRegistry"
 
+const LendingRegistryAddress = Address.fromString("0xB739Dcf499306B191D9D4fa5255A8f20066a6a96");
 export class PieVaultsHelper {
   constructor() { }
 
@@ -28,15 +30,35 @@ export class PieVaultsHelper {
     for(let i = 0; i < tokens.length; i++) {
       let token = tokens[i];
 
+      // binding the LendingRegistry Contract, to check if the token
+      // is wrapped or not...
+      let lendingRegistry = LendingRegistry.bind(LendingRegistryAddress);
+      let wrapped = lendingRegistry.wrappedToUnderlying(token);
+
+      // if the token is wrapped, we replace the token address with the wrapped one,
+      // otherwise we just leave it as it is...
+      if(wrapped.toHex() != "0x0000000000000000000000000000000000000000") {
+        token = wrapped;
+      }
+
+      // first, we bind the current token address to a smart contract...
       let tokenContract = PieVault.bind(token);
+      // then, we use the contract to retrieve the balanceOf...
       let tokenBalance = tokenContract.balanceOf(token);
+      // finally, we use the PriceHelper to get the price of the token...
       let price = PriceHelper.findTokenPrice(token);
 
+      // we can now load the token entity, or create it if it doesn't exist yet...
       let tokenEntity = EntityHelper.loadToken(<ERC20>tokenContract);
+      // loading the tokenInPieTransaction entity, and connect it to the relative token and pieLog...
       let tokenInPieTransaction = EntityHelper.loadTokenInPieTransaction(transaction.hash.toHex(), tokenEntity, pieLog);
 
+      // adding the price to the tokenInPieTransaction entity...
       tokenInPieTransaction.price = price.tokenPrice;
+      // adding the balance to the tokenInPieTransaction entity...
       tokenInPieTransaction.balance = tokenBalance.toBigDecimal();
+
+      // finally, saving the tokenInPieTransaction entity...
       tokenInPieTransaction.save();
     };   
   }
