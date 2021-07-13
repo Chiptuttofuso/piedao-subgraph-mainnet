@@ -6,7 +6,6 @@ import { PieLog } from "../generated/schema"
 import { ERC20 } from "../helpers/ERC20"
 import { LendingRegistry } from "../generated/Ypie/LendingRegistry"
 
-const LendingRegistryAddress = Address.fromString("0xB739Dcf499306B191D9D4fa5255A8f20066a6a96");
 export class PieVaultsHelper {
   constructor() { }
 
@@ -23,6 +22,8 @@ export class PieVaultsHelper {
   }
 
   static calculateTokensPrices(pieVault: PieVault, transaction: ethereum.Transaction, pieLog: PieLog): void {
+    let LendingRegistryAddress = Address.fromString("0xB739Dcf499306B191D9D4fa5255A8f20066a6a96");
+
     // retrieving all the underlying tokens...
     let tokens = pieVault.getTokens();
 
