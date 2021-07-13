@@ -81,7 +81,7 @@ export class EntityHelper {
     return <Position>position;
   }  
 
-  static loadPieLog(transaction: string, token: Token, action: string, amount: BigInt, block: ethereum.Block): PieLog {
+  static loadPieLog(transaction: string, token: Token, action: string, block: ethereum.Block): PieLog {
     let pieVault = PieLog.load(transaction + "_" + token.id);
 
     if (pieVault == null) {

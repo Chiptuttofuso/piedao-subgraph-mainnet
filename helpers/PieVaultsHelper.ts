@@ -72,12 +72,16 @@ export class PieVaultsHelper {
     let token = EntityHelper.loadToken(<ERC20>pieVault);
 
     // loading the PieLog Entity, or creating one if doesn't exist yet...
-    let pieLog = EntityHelper.loadPieLog(event.transaction.hash.toHex(), token, "mint", event.params.amount, event.block);
+    let pieLog = EntityHelper.loadPieLog(event.transaction.hash.toHex(), token, "mint", event.block);
 
-    // TODO: updating the amount and the amountUSD for the pieLog Entity...
-    //  pieLog.amount = BigInt.fromI32(0).toBigDecimal();
-    //  pieLog.amountUSD = BigInt.fromI32(0).toBigDecimal();
-    //  pieLog.save();
+    // updating the amount and the amountUSD for the pieLog Entity...
+    let precision = BigInt.fromI32(10).pow(<u8>token.decimals.toI32()).toBigDecimal();
+    let price = PriceHelper.findTokenPrice(event.address);
+        
+    pieLog.amount = pieLog.amount.plus(event.params.amount.toBigDecimal());
+    pieLog.amountUSD = price.tokenPrice.times(pieLog.amount).div(precision);
+
+    pieLog.save();
 
     // generating the TokensInPieTransaction entities...
     PieVaultsHelper.calculateTokensPrices(pieVault, event.transaction, pieLog);
@@ -91,12 +95,16 @@ export class PieVaultsHelper {
     let token = EntityHelper.loadToken(<ERC20>pieVault);
 
     // loading the PieLog Entity, or creating one if doesn't exist yet...
-    let pieLog = EntityHelper.loadPieLog(event.transaction.hash.toHex(), token, "burn", event.params.amount, event.block);
+    let pieLog = EntityHelper.loadPieLog(event.transaction.hash.toHex(), token, "burn", event.block);
 
-    // TODO: updating the amount and the amountUSD for the pieLog Entity...
-    //  pieLog.amount = BigInt.fromI32(0).toBigDecimal();
-    //  pieLog.amountUSD = BigInt.fromI32(0).toBigDecimal();
-    //  pieLog.save();
+    // updating the amount and the amountUSD for the pieLog Entity...
+    let precision = BigInt.fromI32(10).pow(<u8>token.decimals.toI32()).toBigDecimal();
+    let price = PriceHelper.findTokenPrice(event.address);
+
+    pieLog.amount = pieLog.amount.minus(event.params.amount.toBigDecimal());
+    pieLog.amountUSD = price.tokenPrice.times(pieLog.amount).div(precision);
+
+    pieLog.save();
 
     // generating the TokensInPieTransaction entities...
     PieVaultsHelper.calculateTokensPrices(pieVault, event.transaction, pieLog);
