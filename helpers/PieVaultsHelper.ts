@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts"
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts"
 import { EntityHelper } from "../helpers/EntityHelper"
 import { PriceHelper } from "../helpers/PriceHelper"
 import { PieVault, PoolExited, PoolJoined } from "../generated/Ypie/PieVault"
@@ -21,8 +21,9 @@ export class PieVaultsHelper {
     }
   }
 
-  static calculateTokensPrices(pieVault: PieVault, transaction: ethereum.Transaction, pieLog: PieLog): void {
+  static calculateTokensPrices(pieVault: PieVault, transaction: ethereum.Transaction, pieLog: PieLog): BigDecimal {
     let LendingRegistryAddress = Address.fromString("0xB739Dcf499306B191D9D4fa5255A8f20066a6a96");
+    let totalAmountUSD = BigInt.fromI32(0).toBigDecimal();
 
     // retrieving all the underlying tokens...
     let tokens = pieVault.getTokens();
@@ -61,7 +62,12 @@ export class PieVaultsHelper {
 
       // finally, saving the tokenInPieTransaction entity...
       tokenInPieTransaction.save();
-    };   
+
+      let precision = BigInt.fromI32(10).pow(<u8>tokenEntity.decimals.toI32()).toBigDecimal();
+      totalAmountUSD = totalAmountUSD.plus(price.tokenPrice.times(tokenInPieTransaction.balance).div(precision));
+    };
+
+    return  totalAmountUSD;
   }
 
   static mint(event: PoolJoined): void {
@@ -74,17 +80,11 @@ export class PieVaultsHelper {
     // loading the PieLog Entity, or creating one if doesn't exist yet...
     let pieLog = EntityHelper.loadPieLog(event.transaction.hash.toHex(), token, "mint", event.block);
 
-    // updating the amount and the amountUSD for the pieLog Entity...
-    let precision = BigInt.fromI32(10).pow(<u8>token.decimals.toI32()).toBigDecimal();
-    let price = PriceHelper.findTokenPrice(event.address);
-        
-    pieLog.amount = pieLog.amount.plus(event.params.amount.toBigDecimal());
-    pieLog.amountUSD = price.tokenPrice.times(pieLog.amount).div(precision);
+    // generating the TokensInPieTransaction entities...
+    pieLog.amount = event.params.amount.toBigDecimal();
+    pieLog.amountUSD = PieVaultsHelper.calculateTokensPrices(pieVault, event.transaction, pieLog);    
 
     pieLog.save();
-
-    // generating the TokensInPieTransaction entities...
-    PieVaultsHelper.calculateTokensPrices(pieVault, event.transaction, pieLog);
   }
 
   static burn(event: PoolExited): void {
@@ -97,17 +97,11 @@ export class PieVaultsHelper {
     // loading the PieLog Entity, or creating one if doesn't exist yet...
     let pieLog = EntityHelper.loadPieLog(event.transaction.hash.toHex(), token, "burn", event.block);
 
-    // updating the amount and the amountUSD for the pieLog Entity...
-    let precision = BigInt.fromI32(10).pow(<u8>token.decimals.toI32()).toBigDecimal();
-    let price = PriceHelper.findTokenPrice(event.address);
-
-    pieLog.amount = pieLog.amount.minus(event.params.amount.toBigDecimal());
-    pieLog.amountUSD = price.tokenPrice.times(pieLog.amount).div(precision);
+    // generating the TokensInPieTransaction entities...
+    pieLog.amount = event.params.amount.toBigDecimal();
+    pieLog.amountUSD = PieVaultsHelper.calculateTokensPrices(pieVault, event.transaction, pieLog);    
 
     pieLog.save();
-
-    // generating the TokensInPieTransaction entities...
-    PieVaultsHelper.calculateTokensPrices(pieVault, event.transaction, pieLog);
   }
 
   static incrementAmount(address: Address, amount: BigInt, pieVault: PieVault): void {
