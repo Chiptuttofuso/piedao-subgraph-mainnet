@@ -18,12 +18,20 @@ import {
   TokenAdded,
   TokenRemoved,
   Transfer
-} from "../generated/Ypie/Ypie"
+} from "../generated/Ypie/PieVault"
+import {PieVaultsHelper } from "../helpers/PieVaultsHelper"
 
-/*
-handlerTransfer
-  if address_from 0x0 -> MINT
-*/
+export function handlerTransfer(event: Transfer): void {
+  PieVaultsHelper.transfer(event.address, event.params.from, event.params.to, event.params.value);
+}
+
+export function handlerPoolJoined(event: PoolJoined): void {
+  PieVaultsHelper.mint(event);
+}
+
+export function handlerPoolExited(event: PoolExited): void {
+  PieVaultsHelper.burn(event);
+}
 
 export function handlerAnnualizedFeeSet(event: AnnualizedFeeSet): void {}
 
@@ -51,14 +59,8 @@ export function handlerLockSet(event: LockSet): void {}
 
 export function handlerOwnershipTransferred(event: OwnershipTransferred): void {}
 
-export function handlerPoolExited(event: PoolExited): void {}
-
-export function handlerPoolJoined(event: PoolJoined): void {}
-
 export function handlerTokenAdded(event: TokenAdded): void {}
 
 export function handlerTokenRemoved(event: TokenRemoved): void {}
-
-export function handlerTransfer(event: Transfer): void {}
 
 export function handlerCall(event: Call): void {}

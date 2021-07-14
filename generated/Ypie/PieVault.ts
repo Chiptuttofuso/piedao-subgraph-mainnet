@@ -392,7 +392,7 @@ export class Transfer__Params {
   }
 }
 
-export class Ypie__calcTokensForAmountResult {
+export class PieVault__calcTokensForAmountResult {
   value0: Array<Address>;
   value1: Array<BigInt>;
 
@@ -409,7 +409,7 @@ export class Ypie__calcTokensForAmountResult {
   }
 }
 
-export class Ypie__calcTokensForAmountExitResult {
+export class PieVault__calcTokensForAmountExitResult {
   value0: Array<Address>;
   value1: Array<BigInt>;
 
@@ -426,9 +426,9 @@ export class Ypie__calcTokensForAmountExitResult {
   }
 }
 
-export class Ypie extends ethereum.SmartContract {
-  static bind(address: Address): Ypie {
-    return new Ypie("Ypie", address);
+export class PieVault extends ethereum.SmartContract {
+  static bind(address: Address): PieVault {
+    return new PieVault("PieVault", address);
   }
 
   allowance(owner: Address, spender: Address): BigInt {
@@ -536,14 +536,14 @@ export class Ypie extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  calcTokensForAmount(_amount: BigInt): Ypie__calcTokensForAmountResult {
+  calcTokensForAmount(_amount: BigInt): PieVault__calcTokensForAmountResult {
     let result = super.call(
       "calcTokensForAmount",
       "calcTokensForAmount(uint256):(address[],uint256[])",
       [ethereum.Value.fromUnsignedBigInt(_amount)]
     );
 
-    return new Ypie__calcTokensForAmountResult(
+    return new PieVault__calcTokensForAmountResult(
       result[0].toAddressArray(),
       result[1].toBigIntArray()
     );
@@ -551,7 +551,7 @@ export class Ypie extends ethereum.SmartContract {
 
   try_calcTokensForAmount(
     _amount: BigInt
-  ): ethereum.CallResult<Ypie__calcTokensForAmountResult> {
+  ): ethereum.CallResult<PieVault__calcTokensForAmountResult> {
     let result = super.tryCall(
       "calcTokensForAmount",
       "calcTokensForAmount(uint256):(address[],uint256[])",
@@ -562,7 +562,7 @@ export class Ypie extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new Ypie__calcTokensForAmountResult(
+      new PieVault__calcTokensForAmountResult(
         value[0].toAddressArray(),
         value[1].toBigIntArray()
       )
@@ -571,14 +571,14 @@ export class Ypie extends ethereum.SmartContract {
 
   calcTokensForAmountExit(
     _amount: BigInt
-  ): Ypie__calcTokensForAmountExitResult {
+  ): PieVault__calcTokensForAmountExitResult {
     let result = super.call(
       "calcTokensForAmountExit",
       "calcTokensForAmountExit(uint256):(address[],uint256[])",
       [ethereum.Value.fromUnsignedBigInt(_amount)]
     );
 
-    return new Ypie__calcTokensForAmountExitResult(
+    return new PieVault__calcTokensForAmountExitResult(
       result[0].toAddressArray(),
       result[1].toBigIntArray()
     );
@@ -586,7 +586,7 @@ export class Ypie extends ethereum.SmartContract {
 
   try_calcTokensForAmountExit(
     _amount: BigInt
-  ): ethereum.CallResult<Ypie__calcTokensForAmountExitResult> {
+  ): ethereum.CallResult<PieVault__calcTokensForAmountExitResult> {
     let result = super.tryCall(
       "calcTokensForAmountExit",
       "calcTokensForAmountExit(uint256):(address[],uint256[])",
@@ -597,7 +597,7 @@ export class Ypie extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new Ypie__calcTokensForAmountExitResult(
+      new PieVault__calcTokensForAmountExitResult(
         value[0].toAddressArray(),
         value[1].toBigIntArray()
       )

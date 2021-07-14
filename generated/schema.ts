@@ -156,13 +156,71 @@ export class Holder extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get tokens(): Array<string> {
-    let value = this.get("tokens");
+  get positions(): Array<string> {
+    let value = this.get("positions");
     return value.toStringArray();
   }
 
-  set tokens(value: Array<string>) {
-    this.set("tokens", Value.fromStringArray(value));
+  set positions(value: Array<string>) {
+    this.set("positions", Value.fromStringArray(value));
+  }
+}
+
+export class Position extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save Position entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save Position entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("Position", id.toString(), this);
+  }
+
+  static load(id: string): Position | null {
+    return store.get("Position", id) as Position | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get balance(): BigDecimal {
+    let value = this.get("balance");
+    return value.toBigDecimal();
+  }
+
+  set balance(value: BigDecimal) {
+    this.set("balance", Value.fromBigDecimal(value));
+  }
+
+  get holder(): string {
+    let value = this.get("holder");
+    return value.toString();
+  }
+
+  set holder(value: string) {
+    this.set("holder", Value.fromString(value));
+  }
+
+  get token(): string {
+    let value = this.get("token");
+    return value.toString();
+  }
+
+  set token(value: string) {
+    this.set("token", Value.fromString(value));
   }
 }
 
@@ -196,13 +254,13 @@ export class Token extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get balance(): BigInt {
-    let value = this.get("balance");
-    return value.toBigInt();
+  get name(): string {
+    let value = this.get("name");
+    return value.toString();
   }
 
-  set balance(value: BigInt) {
-    this.set("balance", Value.fromBigInt(value));
+  set name(value: string) {
+    this.set("name", Value.fromString(value));
   }
 
   get symbol(): string {
@@ -214,12 +272,188 @@ export class Token extends Entity {
     this.set("symbol", Value.fromString(value));
   }
 
-  get holder(): string {
-    let value = this.get("holder");
+  get decimals(): BigInt {
+    let value = this.get("decimals");
+    return value.toBigInt();
+  }
+
+  set decimals(value: BigInt) {
+    this.set("decimals", Value.fromBigInt(value));
+  }
+}
+
+export class PieLog extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save PieLog entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save PieLog entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("PieLog", id.toString(), this);
+  }
+
+  static load(id: string): PieLog | null {
+    return store.get("PieLog", id) as PieLog | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
     return value.toString();
   }
 
-  set holder(value: string) {
-    this.set("holder", Value.fromString(value));
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get pieAddress(): Bytes {
+    let value = this.get("pieAddress");
+    return value.toBytes();
+  }
+
+  set pieAddress(value: Bytes) {
+    this.set("pieAddress", Value.fromBytes(value));
+  }
+
+  get pieSymbol(): string {
+    let value = this.get("pieSymbol");
+    return value.toString();
+  }
+
+  set pieSymbol(value: string) {
+    this.set("pieSymbol", Value.fromString(value));
+  }
+
+  get action(): string {
+    let value = this.get("action");
+    return value.toString();
+  }
+
+  set action(value: string) {
+    this.set("action", Value.fromString(value));
+  }
+
+  get block(): BigInt {
+    let value = this.get("block");
+    return value.toBigInt();
+  }
+
+  set block(value: BigInt) {
+    this.set("block", Value.fromBigInt(value));
+  }
+
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
+    return value.toBigInt();
+  }
+
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get amount(): BigDecimal {
+    let value = this.get("amount");
+    return value.toBigDecimal();
+  }
+
+  set amount(value: BigDecimal) {
+    this.set("amount", Value.fromBigDecimal(value));
+  }
+
+  get amountUSD(): BigDecimal {
+    let value = this.get("amountUSD");
+    return value.toBigDecimal();
+  }
+
+  set amountUSD(value: BigDecimal) {
+    this.set("amountUSD", Value.fromBigDecimal(value));
+  }
+
+  get tokensInPieTransaction(): Array<string> {
+    let value = this.get("tokensInPieTransaction");
+    return value.toStringArray();
+  }
+
+  set tokensInPieTransaction(value: Array<string>) {
+    this.set("tokensInPieTransaction", Value.fromStringArray(value));
+  }
+}
+
+export class TokenInPieTransaction extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id !== null,
+      "Cannot save TokenInPieTransaction entity without an ID"
+    );
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save TokenInPieTransaction entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("TokenInPieTransaction", id.toString(), this);
+  }
+
+  static load(id: string): TokenInPieTransaction | null {
+    return store.get(
+      "TokenInPieTransaction",
+      id
+    ) as TokenInPieTransaction | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get price(): BigDecimal {
+    let value = this.get("price");
+    return value.toBigDecimal();
+  }
+
+  set price(value: BigDecimal) {
+    this.set("price", Value.fromBigDecimal(value));
+  }
+
+  get balance(): BigDecimal {
+    let value = this.get("balance");
+    return value.toBigDecimal();
+  }
+
+  set balance(value: BigDecimal) {
+    this.set("balance", Value.fromBigDecimal(value));
+  }
+
+  get token(): string {
+    let value = this.get("token");
+    return value.toString();
+  }
+
+  set token(value: string) {
+    this.set("token", Value.fromString(value));
+  }
+
+  get pieLog(): string {
+    let value = this.get("pieLog");
+    return value.toString();
+  }
+
+  set pieLog(value: string) {
+    this.set("pieLog", Value.fromString(value));
   }
 }
